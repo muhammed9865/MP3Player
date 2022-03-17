@@ -7,4 +7,13 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!--
+        60 -> 60% of the screen but not clickable, most likely the background
+        30 -> 30% of the screen but not clickable, most likely the list items background, more exposed than 60%
+        10 -> 10% of the screen and clickable, buttons or anything to be clicked
+     -->
+    <color name="background_color_60">#272727</color>
+    <color name="primary_color_30">#4B4E4B</color>
+    <color name="widgets_color_10">#22B50B</color>
 </resources>

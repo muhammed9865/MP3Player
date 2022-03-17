@@ -1,12 +1,15 @@
 package com.example.mp3player.util
 
 import android.media.MediaPlayer
+import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import java.lang.IllegalStateException
 
 
 open class AudioController(private val mp: MediaPlayer, private var path: String?) {
+    private var isStarted = false
+
     init {
         preparePlayer()
     }
@@ -24,22 +27,36 @@ open class AudioController(private val mp: MediaPlayer, private var path: String
     }
 
     fun start() {
-        mp.setOnPreparedListener { player ->
-            player.start()
+        if (!isStarted)
+            mp.setOnPreparedListener {
+                mp.start()
+                isStarted = true
+            } else {
+            mp.start()
         }
     }
 
     fun pause() {
-        mp.setOnPreparedListener { player ->
-            player.pause()
+        Log.d("_RENDER_MAIN", "pause: ${mp.isPlaying}")
+        if (mp.isPlaying) {
+            mp.pause()
+            Log.d("_RENDER_MAIN", "pause: ${mp.isPlaying}")
         }
+
     }
 
     fun stop() {
-        mp.setOnPreparedListener { player ->
-            player.stop()
-            player.release()
+        if (mp.isPlaying) {
+            mp.pause()
+            mp.seekTo(0)
+            Log.d("_RENDER_MAIN", "pause: ${mp.isPlaying}")
+
         }
+
+    }
+
+    fun release() {
+        mp.release()
     }
 
     fun changeDataSource(newPath: String) {

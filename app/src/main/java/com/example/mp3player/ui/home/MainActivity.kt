@@ -2,14 +2,12 @@ package com.example.mp3player.ui.home
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.example.mp3player.R
 import com.example.mp3player.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -30,6 +28,26 @@ class MainActivity : AppCompatActivity() {
         }
         renderIfPermissionGranted()
 
+        binding.btnStart.setOnClickListener {
+            lifecycleScope.launchWhenStarted {
+                viewModel.intentsChannel.send(MainIntents.PlayAudio(
+                    path = "/storage/emulated/0/Download/Dndnha.Com.Wegz.El Ghasala.mp3"
+                ))
+            }
+        }
+
+        binding.btnPause.setOnClickListener {
+            lifecycleScope.launchWhenStarted {
+                viewModel.intentsChannel.send(MainIntents.Pause)
+            }
+        }
+
+        binding.btnStop.setOnClickListener {
+            lifecycleScope.launchWhenStarted {
+                viewModel.intentsChannel.send(MainIntents.Stop)
+            }
+        }
+
     }
 
     private fun renderIfPermissionGranted() {
@@ -49,8 +67,15 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launchWhenStarted {
             viewModel.state.collect { state ->
                 when(state) {
+                    is MainViewStates.Idle -> {}
                     is MainViewStates.LoadedSongs -> {
                         Log.d(TAG, "render: ${state.songs}")
+                    }
+                    is MainViewStates.CurrentPlaybackPosition -> {
+                        lifecycleScope.launchWhenStarted {
+                            Log.d(TAG, "render: ${state.timeInSec}")
+                        }
+
                     }
                 }
             }
