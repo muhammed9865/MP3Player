@@ -3,6 +3,7 @@ package com.example.mp3player.ui.home
 import android.media.MediaPlayer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.mp3player.data.model.MP3File
 import com.example.mp3player.data.repository.AudioRepository
 import com.example.mp3player.util.AudioController
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,6 +11,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -46,7 +48,8 @@ class MediaViewModel @Inject constructor(private val repository: AudioRepository
 
     private fun loadSongs() {
         viewModelScope.launch {
-            repository.fetchSongs().collect {
+            repository.fetchSongs()
+                .collect {
                 _state.value = MainViewStates.LoadedSongs(it)
             }
         }

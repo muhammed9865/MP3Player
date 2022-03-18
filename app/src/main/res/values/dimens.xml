@@ -1,2 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <dimen name="main_corner_radius">@dimen/_25sdp</dimen>
+    <dimen name="audio_title_size">@dimen/_16ssp</dimen>
+</resources>

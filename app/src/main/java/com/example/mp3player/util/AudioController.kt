@@ -2,8 +2,8 @@ package com.example.mp3player.util
 
 import android.media.MediaPlayer
 import android.util.Log
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import com.example.mp3player.ui.home.adapter.PlayerStates
+import kotlinx.coroutines.flow.*
 import java.lang.IllegalStateException
 
 
@@ -29,33 +29,29 @@ open class AudioController(private val mp: MediaPlayer, private var path: String
     fun start() {
         if (!isStarted)
             mp.setOnPreparedListener {
+                Log.d("_AudioController", "start: $path")
                 mp.start()
                 isStarted = true
+
             } else {
             mp.start()
         }
     }
 
     fun pause() {
-        Log.d("_RENDER_MAIN", "pause: ${mp.isPlaying}")
         if (mp.isPlaying) {
             mp.pause()
-            Log.d("_RENDER_MAIN", "pause: ${mp.isPlaying}")
         }
-
     }
 
     fun stop() {
-        if (mp.isPlaying) {
-            mp.pause()
-            mp.seekTo(0)
-            Log.d("_RENDER_MAIN", "pause: ${mp.isPlaying}")
-
-        }
-
+        mp.stop()
+        mp.reset()
+        isStarted = false
     }
 
     fun release() {
+        isStarted = false
         mp.release()
     }
 
@@ -64,14 +60,21 @@ open class AudioController(private val mp: MediaPlayer, private var path: String
         preparePlayer()
     }
 
+
     suspend fun setOnTimeChangeListener(): Flow<Int> {
+       return flow {
+                do{
+                    emit(mp.currentPosition.div(1000))
+                    kotlinx.coroutines.delay(1000)
+                }while (isPlaying())
+       }
+        }
+
+    suspend fun emitAudioDuration(): Flow<Int> {
         return flow {
-            while (isPlaying()) {
-                emit(mp.currentPosition)
-                kotlinx.coroutines.delay(1000)
-            }
+            emit(mp.duration.div(1000))
         }
     }
 
-    private fun isPlaying() = mp.currentPosition <= mp.duration
+    private fun isPlaying() = mp.isPlaying
 }

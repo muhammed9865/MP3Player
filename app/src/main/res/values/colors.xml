@@ -16,4 +16,6 @@
     <color name="background_color_60">#272727</color>
     <color name="primary_color_30">#4B4E4B</color>
     <color name="widgets_color_10">#22B50B</color>
+    <color name="main_text_color">#FFFDFD</color>
+    <color name="artist_text_color">#BFBABA</color>
 </resources>

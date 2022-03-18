@@ -9,7 +9,12 @@ import android.view.LayoutInflater
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.example.mp3player.databinding.ActivityMainBinding
+import com.example.mp3player.ui.home.adapter.AudioAdapter
+import com.example.mp3player.ui.home.adapter.ControlAudio
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flow
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -19,6 +24,10 @@ class MainActivity : AppCompatActivity() {
     private val binding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(LayoutInflater.from(this))
     }
+    private val mAdapter: AudioAdapter by lazy {
+        AudioAdapter()
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,30 +37,12 @@ class MainActivity : AppCompatActivity() {
         }
         renderIfPermissionGranted()
 
-        binding.btnStart.setOnClickListener {
-            lifecycleScope.launchWhenStarted {
-                viewModel.intentsChannel.send(MainIntents.PlayAudio(
-                    path = "/storage/emulated/0/Download/Dndnha.Com.Wegz.El Ghasala.mp3"
-                ))
-            }
-        }
-
-        binding.btnPause.setOnClickListener {
-            lifecycleScope.launchWhenStarted {
-                viewModel.intentsChannel.send(MainIntents.Pause)
-            }
-        }
-
-        binding.btnStop.setOnClickListener {
-            lifecycleScope.launchWhenStarted {
-                viewModel.intentsChannel.send(MainIntents.Stop)
-            }
-        }
+        binding.audioRv.adapter = mAdapter
 
     }
 
     private fun renderIfPermissionGranted() {
-        if (checkSelfPermission(Manifest.permission.MANAGE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             render()
         }else {
             requestPermissions(
@@ -69,13 +60,9 @@ class MainActivity : AppCompatActivity() {
                 when(state) {
                     is MainViewStates.Idle -> {}
                     is MainViewStates.LoadedSongs -> {
-                        Log.d(TAG, "render: ${state.songs}")
+                        mAdapter.submitList(state.songs)
                     }
                     is MainViewStates.CurrentPlaybackPosition -> {
-                        lifecycleScope.launchWhenStarted {
-                            Log.d(TAG, "render: ${state.timeInSec}")
-                        }
-
                     }
                 }
             }
